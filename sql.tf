@@ -1,6 +1,6 @@
 ## Azure SQL Server
 resource "azurerm_mssql_server" "sql_server" {
-  name                         = "sql-${local.idapp}-${var.environment_short}"
+  name                         = "sql-${lower(local.idapp)}-${var.environment_short}"
   resource_group_name          = azurerm_resource_group.rg_01.name
   location                     = azurerm_resource_group.rg_01.location
   version                      = "12.0"

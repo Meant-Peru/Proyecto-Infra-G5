@@ -1,5 +1,6 @@
 locals {
-  idapp = "AppG5" # Apellido
+  idapp  = "AppG5" # Apellido
+  acr_id = terraform.workspace == "default" ? azurerm_container_registry.acr[0].id : data.azurerm_container_registry.acr_existing[0].id
 }
 
 resource "azurerm_resource_group" "rg_01" {
@@ -30,21 +31,29 @@ resource "azurerm_kubernetes_cluster" "aks_01" {
   role_based_access_control_enabled = true
 }
 
-## ACR
+## ACR - Solo crear en DEV (workspace default)
 resource "azurerm_container_registry" "acr" {
-   name = "acr${local.idapp}"
-   location = azurerm_resource_group.rg_01.location  
-   resource_group_name = azurerm_resource_group.rg_01.name 
-   sku = "Basic" 
-   admin_enabled = false 
-   }
+  count               = terraform.workspace == "default" ? 1 : 0
+  name                = "acr${local.idapp}"
+  location            = azurerm_resource_group.rg_01.location
+  resource_group_name = azurerm_resource_group.rg_01.name
+  sku                 = "Basic"
+  admin_enabled       = false
+}
 
-## Dar permiso al AKS para extraer imágenes del ACR 
-resource "azurerm_role_assignment" "aks_acr" { 
-  principal_id = azurerm_kubernetes_cluster.aks_01.kubelet_identity[0].object_id 
-  role_definition_name = "AcrPull" 
-  scope = azurerm_container_registry.acr.id 
-  }
+## Data source para ACR existente en QA y PRD
+data "azurerm_container_registry" "acr_existing" {
+  count               = terraform.workspace != "default" ? 1 : 0
+  name                = "acr${local.idapp}"
+  resource_group_name = "rg-appg5-dev-west-01-AppG5"
+}
+
+## Dar permiso al AKS para extraer imágenes del ACR
+resource "azurerm_role_assignment" "aks_acr" {
+  principal_id         = azurerm_kubernetes_cluster.aks_01.kubelet_identity[0].object_id
+  role_definition_name = "AcrPull"
+  scope                = local.acr_id
+}
 
 ## Configuración del proveedor Kubernetes
 output "client_certificate" {

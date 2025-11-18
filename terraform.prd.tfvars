@@ -5,8 +5,8 @@ resource_group_name = "rg-appg5-prd-west-01-AppG5"
 location            = "West US"
 aks_name            = "aks-appg5-prd-west-01-AppG5"
 dns_prefix          = "aksdns-prd"
-node_count          = 3
-node_vm_size        = "Standard_D2s_v3"  # VM más grande para producción
+node_count          = 2
+node_vm_size        = "Standard_a2_v2"  # Igual que QA por limite de quota
 environment         = "Production"
 environment_short   = "prd"
 
