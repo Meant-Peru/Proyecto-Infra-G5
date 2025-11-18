@@ -42,6 +42,33 @@ variable "environment" {
   default     = "Development"
 }
 
+variable "environment_short" {
+  description = "Nombre corto del entorno (dev, qa, prd)"
+  type        = string
+  default     = "dev"
+}
+
+// SQL Database
+
+variable "sql_admin_username" {
+  description = "Usuario administrador de SQL Server"
+  type        = string
+  default     = "sqladmin"
+  sensitive   = true
+}
+
+variable "sql_admin_password" {
+  description = "Contraseña del administrador de SQL Server"
+  type        = string
+  sensitive   = true
+}
+
+variable "sql_sku_name" {
+  description = "SKU de la base de datos SQL"
+  type        = string
+  default     = "Basic"
+}
+
 //PROVIDER
 
 variable "subscription_id" {
